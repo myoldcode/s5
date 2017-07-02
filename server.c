@@ -60,6 +60,7 @@ static void parse_args(int argc, char **argv)
 			case 'd':
 				debuglvl = atoi(optarg);
 				assert(debuglvl >= 0);
+				break;
 			case 'F':
 				foreground = 1;
 				break;
@@ -357,6 +358,14 @@ int main(int argc, char **argv)
 	assert(http_fake_len > 0);
 
 	parse_args(argc, argv);
+	if (!foreground)
+	{
+		if (daemon(0, 0))
+		{
+			myerr("daemon: %m\n");
+			exit(1);
+		}
+	}
 	
 	setup_signals();
 	setup_listener();
