@@ -283,7 +283,7 @@ static void client_cb(EV_P_ ev_io *w, int events)
 			{
 				myerr("%s sent invalid request\n", c->local);
 				hexdump(R_IDX(c), c->rlen);
-				myerr("%*s\n", c->rlen, R_IDX(c));
+				myerr("%.*s\n", c->rlen, R_IDX(c));
 				mywrite(w->fd, http_fake_buf, http_fake_len);
 				goto fin;
 			}
