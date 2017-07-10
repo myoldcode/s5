@@ -98,6 +98,8 @@ static void write_cb(EV_P_ ev_io *w, int events)
 	rc = mywrite_nb(w->fd, R_IDX(c), c->rlen);
 	if (rc < 0)
 	{
+		if (errno == EBADF)
+			goto fin2;
 		goto fin;
 	}
 	if (rc == c->rlen)
@@ -115,8 +117,6 @@ static void write_cb(EV_P_ ev_io *w, int events)
 	}
 	return;
 fin:
-	ev_io_stop(EV_A_ w);
-	del_wstate(ws);
 	close(c->w.fd);
 	ev_io_stop(EV_A_ &c->w);
 	if (c->pw)
@@ -126,6 +126,9 @@ fin:
 		del_cstate((cstate*)c->pw);
 	}
 	del_cstate(c);
+fin2:
+	ev_io_stop(EV_A_ w);
+	del_wstate(ws);
 }
 //setup write watcher to avoid transfer hang
 static void setup_write_cb(cstate *c, int fd)
