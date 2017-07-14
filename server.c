@@ -41,6 +41,7 @@ static void usage()
 {
 	mylog("Usage:\n"
 		"-h			help\n"
+		"-F			forground\n"
 		"-d			log level(1 info, 2 trace)\n"
 		"-l			ip:port\n");
 	exit(1);
