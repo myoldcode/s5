@@ -28,6 +28,7 @@ static void usage()
 {
 	mylog("Usage:\n"
 		"-h			help\n"
+		"-F			foreground\n"
 		"-d			log level(1 info, 2 trace)\n"
 		"-l			ip:port\n"
 		"-t			ip:port\n");
@@ -353,6 +354,14 @@ int main(int argc, char **argv)
 	loop = EV_DEFAULT;
 
 	parse_args(argc, argv);
+	if (!foreground)
+	{
+		if (daemon(0, 0))
+		{
+			myerr("daemon: %m\n");
+			exit(1);
+		}
+	}
 	
 	setup_signals();
 	setup_listener();
