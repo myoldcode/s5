@@ -293,7 +293,7 @@ static void client_cb(EV_P_ ev_io *w, int events)
 			break;
 		case CS_SOCKS_REQUEST_INPROGESS:
 		{
-			//may reach here when connection reset
+			//may reach here when connection timeout
 			myerr("client comes while request in progress\n");
 			goto fin;
 		}
