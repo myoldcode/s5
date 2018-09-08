@@ -20,7 +20,6 @@ uint16_t local_port = RELAY_PORT;
 uint32_t local_server = INADDR_ANY;
 int backlog = 1024;
 int foreground = 0;
-FILE *logfile;
 int debuglvl = 0;
 
 static void usage()
@@ -30,7 +29,7 @@ static void usage()
 		"-F			foreground\n"
 		"-d			log level(1 info, 2 trace)\n"
 		"-l			ip:port\n"
-		"-t			ip:port\n");
+		"-r			ip:port\n");
 	exit(1);
 }
 
@@ -38,7 +37,7 @@ static void parse_args(int argc, char **argv)
 {
 	int opt;
 	
-	while ((opt = getopt(argc, argv, "hd:Fl:t:")) != -1)
+	while ((opt = getopt(argc, argv, "hd:Fl:r:")) != -1)
 	{
 		switch (opt)
 		{
@@ -55,7 +54,7 @@ static void parse_args(int argc, char **argv)
 			case 'l':
 				parse_ip_port(optarg, &local_server, &local_port);
 				break;
-			case 't':
+			case 'r':
 				parse_ip_port(optarg, &relay_server, &relay_port);
 				break;
 			default:
@@ -348,8 +347,6 @@ static void setup_listener(void)
 }
 int main(int argc, char **argv)
 {
-	logfile = stdout;
-
 	loop = EV_DEFAULT;
 
 	parse_args(argc, argv);
