@@ -1,5 +1,4 @@
 #include "socks.h"
-#include "mylog.h"
 #include "mysocket.h"
 
 #define SOCKS5_VERSION	5
@@ -30,7 +29,7 @@ int socks_do_method(uint8_t *rbuf, uint16_t rlen, uint8_t *wbuf, uint16_t *wlen)
 	}
 	if (i == mlen)
 	{
-		myerr("only support method X'00'\n");
+		printf("only support method X'00'\n");
 		return -1;
 	}
 	wbuf[0] = SOCKS5_VERSION;
@@ -50,7 +49,7 @@ int socks_do_request(uint8_t *rbuf, uint16_t rlen, uint8_t *wbuf, uint16_t *wlen
 		return 0;
 	if (rbuf[1] != CMD_CONNECT)
 	{
-		myerr("only support CONNECT\n");
+		printf("only support CONNECT\n");
 		return -1;
 	}
 	type = rbuf[3];
@@ -72,7 +71,7 @@ int socks_do_request(uint8_t *rbuf, uint16_t rlen, uint8_t *wbuf, uint16_t *wlen
 		case 4:
 			//fallthru, no ipv6 support
 		default:
-			myerr("bad address type: %d\n", type);
+			printf("bad address type: %d\n", type);
 			return -1;
 			break;
 	}
@@ -96,7 +95,7 @@ int socks_do_request_server(uint8_t *rbuf, uint16_t rlen, uint8_t *wbuf, uint16_
 		return -100;
 	if (rbuf[1] != CMD_CONNECT)
 	{
-		myerr("only support CONNECT\n");
+		printf("only support CONNECT\n");
 		return -1;
 	}
 	type = rbuf[3];
@@ -123,7 +122,7 @@ int socks_do_request_server(uint8_t *rbuf, uint16_t rlen, uint8_t *wbuf, uint16_
 		case 4:
 			//fallthru, no ipv6 support
 		default:
-			myerr("bad address type: %d\n", type);
+			printf("bad address type: %d\n", type);
 			return -1;
 			break;
 	}

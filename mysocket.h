@@ -1,6 +1,7 @@
 #ifndef _MYSOCKET_H_
 #define _MYSOCKET_H_
 
+#include <stdio.h>
 #include <stdint.h>
 #include <errno.h>
 #include <sys/socket.h>

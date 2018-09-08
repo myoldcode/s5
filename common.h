@@ -1,12 +1,15 @@
 #ifndef _COMMON_H_
 #define _COMMON_H_
 
+#include <stdio.h>
 #include <signal.h>
 #include <string.h>
 #include <stdlib.h>
 #include "mysocket.h"
 
 #define RELAY_PORT	12345
+
+#define ok_or_goto(v, l) if (!(v)) goto l;
 
 static inline void parse_ip_port(char *str, uint32_t *ip, uint16_t *port)
 {
@@ -63,7 +66,7 @@ static inline void setup_signals(void)
 	rc = sigaction(SIGPIPE, &act, NULL);
 	if (rc)
 	{
-		myerr("sigaction: %m\n");
+		printf("sigaction: %m\n");
 		exit(1);
 	}
 }

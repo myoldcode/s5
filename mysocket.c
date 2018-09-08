@@ -5,7 +5,6 @@
 #include <fcntl.h>
 
 #include "mysocket.h"
-#include "mylog.h"
 
 int myconnect(struct sockaddr *addr, socklen_t len, uint16_t port)
 {
@@ -15,14 +14,14 @@ int myconnect(struct sockaddr *addr, socklen_t len, uint16_t port)
 	fd = socket(AF_INET, SOCK_STREAM, 0);
 	if (fd < 0)
 	{
-		myerr("socket6: %s\n", strerror(errno));
+		printf("socket6: %s\n", strerror(errno));
 		return -1;
 	}
 	((struct sockaddr_in*)addr)->sin_port = htons(port);
 	rc = connect(fd, addr, len);
 	if (rc < 0)
 	{
-		myerr("connect4: %s\n", strerror(errno));
+		printf("connect4: %s\n", strerror(errno));
 		close(fd);
 		return -1;
 	}
@@ -36,14 +35,14 @@ int myconnect6(struct sockaddr *addr, socklen_t len, uint16_t port)
 	fd = socket(AF_INET6, SOCK_STREAM, 0);
 	if (fd < 0)
 	{
-		myerr("socket6: %s\n", strerror(errno));
+		printf("socket6: %s\n", strerror(errno));
 		return -1;
 	}
 	((struct sockaddr_in6*)addr)->sin6_port = htons(port);
 	rc = connect(fd, addr, len);
 	if (rc < 0)
 	{
-		myerr("connect6: %s\n", strerror(errno));
+		printf("connect6: %s\n", strerror(errno));
 		close(fd);
 		return -1;
 	}
@@ -62,7 +61,7 @@ static int get_domain_addr(uint8_t *domain, struct addrinfo **res)
 	}
 	else
 	{
-		myerr("getaddrinfo: %s\n", gai_strerror(rc));
+		printf("getaddrinfo: %s\n", gai_strerror(rc));
 	}
 	return -1;
 }
@@ -91,7 +90,7 @@ int get_domain_addr(uint8_t *domain, struct hostent **ent)
 	*ent = gethostbyname(domain);
 	if (!*ent)
 	{
-		myerr("gethostbyname: %m :%s\n", hstrerror(h_errno));
+		printf("gethostbyname: %m :%s\n", hstrerror(h_errno));
 		return -1;
 	}
 	return 0;
@@ -146,7 +145,7 @@ int open_ipv4_nb(uint32_t addr, uint16_t port, int *sock)
 	fd = socket(AF_INET, SOCK_STREAM, 0);
 	if (fd < 0)
 	{
-		myerr("socket: %m\n");
+		printf("socket: %m\n");
 		return -1;
 	}
 	fd_set_nonblock(fd);
@@ -183,7 +182,7 @@ int open_domain_nb(uint8_t *domain, uint16_t port, int *sock)
 	fd = socket(AF_INET, SOCK_STREAM, 0);
 	if (fd < 0)
 	{
-		myerr("socket: %m\n");
+		printf("socket: %m\n");
 		return -1;
 	}
 	fd_set_nonblock(fd);
@@ -234,14 +233,14 @@ int mylisten(uint32_t addr, uint16_t port, int backlog)
 	fd = socket(AF_INET, SOCK_STREAM, 0);
 	if (fd < 0)
 	{
-		myerr("socket: %s\n", strerror(errno));
+		printf("socket: %s\n", strerror(errno));
 		return -1;
 	}
 
 	rc = setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &one, sizeof(int));
 	if (rc != 0)
 	{
-		myerr("REUSEADDR: %s\n", strerror(errno));
+		printf("REUSEADDR: %s\n", strerror(errno));
 		close(fd);
 		return -1;
 	}
@@ -252,14 +251,14 @@ int mylisten(uint32_t addr, uint16_t port, int backlog)
 	rc = bind(fd, (struct sockaddr*)&in, sizeof(in));
 	if (rc < 0)
 	{
-		myerr("bind: %s\n", strerror(errno));
+		printf("bind: %s\n", strerror(errno));
 		close(fd);
 		return -1;
 	}
 	rc = listen(fd, backlog);
 	if (rc < 0)
 	{
-		myerr("listen: %s\n", strerror(errno));
+		printf("listen: %s\n", strerror(errno));
 		close(fd);
 		return -1;
 	}
@@ -280,7 +279,7 @@ redo:
 		}
 		else
 		{
-			myerr("accept: %s\n", strerror(errno));
+			printf("accept: %s\n", strerror(errno));
 		}
 	}
 	return rc;
@@ -300,7 +299,7 @@ redo:
 		}
 		else
 		{
-			myerr("read: %s\n", strerror(errno));
+			printf("read: %s\n", strerror(errno));
 		}
 	}
 	return rc;
@@ -323,12 +322,12 @@ int mywrite(int fd, uint8_t *buf, size_t len)
 			}
 			else if (errno == EPIPE)
 			{
-				myerr("\nEPIPE\n\n");
+				printf("\nEPIPE\n\n");
 				return -1;
 			}
 			else
 			{
-				myerr("write: %s\n", strerror(errno));
+				printf("write: %s\n", strerror(errno));
 				return -1;
 			}
 		}
@@ -353,7 +352,7 @@ int mywrite_nb(int fd, uint8_t *buf, size_t len)
 		}
 		else
 		{
-			myerr("write: %m\n");
+			printf("write: %m\n");
 			return -1;
 		}
 	}
@@ -367,7 +366,7 @@ int fd_set_nonblock(int fd)
 	flags |= O_NONBLOCK;
 	if (fcntl(fd, F_SETFL, flags) < 0)
 	{
-		myerr("fnctl: %m\n");
+		printf("fnctl: %m\n");
 		return -1;
 	}
 	return 0;
@@ -379,7 +378,7 @@ int tcp_set_keepalive(int sock, int value)
 	rc = setsockopt(sock, SOL_SOCKET, SO_KEEPALIVE, &value, sizeof(int));
 	if (rc)
 	{
-		myerr("setsockopt: %s\n", strerror(errno));
+		printf("setsockopt: %s\n", strerror(errno));
 		return -1;
 	}
 	return 0;
@@ -405,7 +404,7 @@ void ip2str(int type, char *p, uint8_t *ip)
 	rc = inet_ntop(type, ip, p, INET6_ADDRSTRLEN);
 	if (rc == NULL)
 	{
-		myerr("ip2str: %m\n");
+		printf("ip2str: %m\n");
 		snprintf(p, INET6_ADDRSTRLEN, "Unknown");
 	}
 }
@@ -423,7 +422,7 @@ void sa2str(struct sockaddr *sa, char *p)
 	}
 	if (rc == NULL)
 	{
-		myerr("sa2str: inet_ntop failed: %m\n");
+		printf("sa2str: inet_ntop failed: %m\n");
 		snprintf(p, INET6_ADDRSTRLEN, "Unknown");
 	}
 }

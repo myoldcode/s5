@@ -75,7 +75,7 @@ static void write_cb(EV_P_ ev_io *w, int events)
 	cstate *c = ws->c;
 	int rc;
 
-	myerr("write_cb called for %s(peer %s)\n", c->server, c->local);
+	printf("write_cb called for %s(peer %s)\n", c->server, c->local);
 
 	rc = mywrite_nb(w->fd, R_IDX(c), c->rlen);
 	if (rc < 0)
@@ -130,7 +130,7 @@ static void relay_cb(EV_P_ ev_io *w, int events)
 
 	if (c->state == CS_DATA)
 	{
-		mytrace("%s(peer %s) readable\n", c->local, c->server);
+		printf("%s(peer %s) readable\n", c->local, c->server);
 		rc = transfer(c, setup_write_cb);
 		if (rc < 0)
 		{
@@ -144,19 +144,19 @@ static void relay_cb(EV_P_ ev_io *w, int events)
 		rc = getsockopt(w->fd, SOL_SOCKET, SO_ERROR, &err, &len);
 		if (rc != 0)
 		{
-			myerr("RELAY: getsockopt: %m\n");
+			printf("RELAY: getsockopt: %m\n");
 			goto fin;
 		}
 		if (err != 0)
 		{
-			myerr("RELAY: connect: %s\n", strerror(err));
+			printf("RELAY: connect: %s\n", strerror(err));
 			goto fin;
 		}
 
 		rc = mywrite_nb(w->fd, pc->rbuf, pc->rlen);
 		if (rc < 0 || rc < len)
 		{
-			myerr("RELAY: write\n");
+			printf("RELAY: write\n");
 			goto fin;
 		}
 		else
@@ -168,14 +168,14 @@ static void relay_cb(EV_P_ ev_io *w, int events)
 		ev_io_stop(EV_A_ w);
 		ev_io_init(w, relay_cb, rc, EV_READ);
 		ev_io_start(loop, w);
-		mytrace("RELAY: connected\n");
+		printf("RELAY: connected\n");
 		c->state = CS_DATA;
 		((cstate*)c->pw)->state = CS_DATA;
-		mytrace("into CS_DATA\n");
+		printf("into CS_DATA\n");
 	}
 	else
 	{
-		myerr("RELAY: bad state: %d\n", c->state);
+		printf("RELAY: bad state: %d\n", c->state);
 		goto fin;
 	}
 	return;
@@ -199,7 +199,7 @@ static void client_cb(EV_P_ ev_io *w, int events)
 	{
 		case CS_DATA:
 		{
-			mytrace("%s(peer %s) readable\n", c->local, c->server);
+			printf("%s(peer %s) readable\n", c->local, c->server);
 			rc = transfer(c, setup_write_cb);
 			if (rc < 0)
 				goto fin;
@@ -219,11 +219,11 @@ static void client_cb(EV_P_ ev_io *w, int events)
 				if (rc < 0 || rc < c->wlen)
 				{
 					//should not block
-					myerr("METHOD: write\n");
+					printf("METHOD: write\n");
 					goto fin;
 				}
 				c->wlen = c->widx = 0;
-				mytrace("into CS_SOCKS_REQUEST\n");
+				printf("into CS_SOCKS_REQUEST\n");
 				c->state = CS_SOCKS_REQUEST;
 			}
 			else if (rc < 0)
@@ -247,7 +247,7 @@ static void client_cb(EV_P_ ev_io *w, int events)
 				rc = relay_request(R_IDX(c), rc, &fd);
 				if (rc < 0 && rc != -EINPROGRESS)
 				{
-					myerr("REQUEST: relay\n");
+					printf("REQUEST: relay\n");
 					goto fin;
 				}
 				cstate *pc = new_cstate();
@@ -262,12 +262,12 @@ static void client_cb(EV_P_ ev_io *w, int events)
 					c->rlen = c->ridx = 0;
 					ev_io_init(&pc->w, relay_cb, fd, EV_READ);
 					ev_io_start(loop, &pc->w);
-					mytrace("into CS_DATA\n");
+					printf("into CS_DATA\n");
 					//wbuf == reply
 					rc = mywrite(w->fd, c->wbuf, c->wlen);
 					if (rc < 0 || rc < c->wlen)
 					{
-						myerr("REQUEST: write\n");
+						printf("REQUEST: write\n");
 						goto fin;
 					}
 					c->wlen = c->widx = 0;
@@ -277,7 +277,7 @@ static void client_cb(EV_P_ ev_io *w, int events)
 					pc->state = c->state = CS_SOCKS_REQUEST_INPROGESS;
 					ev_io_init(&pc->w, relay_cb, fd, EV_WRITE);
 					ev_io_start(loop, &pc->w);
-					mytrace("REQUEST: in progress\n");
+					printf("REQUEST: in progress\n");
 				}
 			}
 			else if (rc < 0)
@@ -290,13 +290,13 @@ static void client_cb(EV_P_ ev_io *w, int events)
 		case CS_SOCKS_REQUEST_INPROGESS:
 		{
 			//may reach here when relay timeout
-			myerr("client comes while request in progress\n");
+			printf("client comes while request in progress\n");
 			goto fin;
 		}
 			break;
 		default:
 		{
-			myerr("invalid state: %d\n", c->state);
+			printf("invalid state: %d\n", c->state);
 			goto fin;
 		}
 			break;
@@ -357,7 +357,7 @@ int main(int argc, char **argv)
 	{
 		if (daemon(0, 0))
 		{
-			myerr("daemon: %m\n");
+			printf("daemon: %m\n");
 			exit(1);
 		}
 	}

@@ -2,7 +2,6 @@
 #define _CSTATE_H_
 
 #include <stdlib.h>
-#include "mylog.h"
 #include "mysocket.h"
 
 enum c_state
@@ -46,7 +45,7 @@ static inline cstate *new_cstate(void)
 	cstate *c = malloc(sizeof(cstate));
 	if (!c)
 	{
-		myerr("CSTATE: oom\n");
+		printf("CSTATE: oom\n");
 		exit(1);
 	}
 	c->state = CS_START;
@@ -64,7 +63,7 @@ static inline wstate *new_wstate(void)
 	wstate *w = malloc(sizeof(wstate));
 	if (!w)
 	{
-		myerr("WSTATE: oom\n");
+		printf("WSTATE: oom\n");
 		exit(1);
 	}
 	return w;
@@ -81,7 +80,7 @@ static inline int transfer(cstate *c, void(*cb)(cstate*,int))
 	{
 		if (c->rlen > 0)
 		{
-			mytrace("%s(peer %s) rcvbuf full\n", c->local, c->server);
+			printf("%s(peer %s) rcvbuf full\n", c->local, c->server);
 			goto wr;
 		}
 		else
@@ -92,7 +91,7 @@ static inline int transfer(cstate *c, void(*cb)(cstate*,int))
 	rc = myread(c->w.fd, R_NEXT(c), R_FREE(c));
 	if (rc <= 0)
 		return -1;
-	mytrace("%s(peer %s) read %d bytes\n", c->local, c->server, rc);
+	printf("%s(peer %s) read %d bytes\n", c->local, c->server, rc);
 	c->rlen += rc;
 wr:
 	rc = mywrite_nb(c->pw->fd, c->rbuf + c->ridx, c->rlen);
@@ -100,7 +99,7 @@ wr:
 	{
 		return -1;
 	}
-	mytrace("%s(peer %s) write %d bytes\n", c->local, c->server, rc);
+	printf("%s(peer %s) write %d bytes\n", c->local, c->server, rc);
 	if (rc == c->rlen)
 	{
 		c->ridx = c->rlen = 0;
@@ -112,7 +111,7 @@ wr:
 		//need to setup write watcher to avoid transfer hang
 		if (cb)
 		{
-			mytrace("setup write cb for %s(peer %s)\n", c->server, c->local);
+			printf("setup write cb for %s(peer %s)\n", c->server, c->local);
 			cb(c, c->pw->fd);
 		}
 	}
