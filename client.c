@@ -6,7 +6,6 @@
 #include <assert.h>
 #include <unistd.h>
 #include <linux/limits.h>
-#include "mylog.h"
 #include "mysocket.h"
 #include "socks.h"
 #include "cstate.h"
@@ -26,7 +25,7 @@ int debuglvl = 0;
 
 static void usage()
 {
-	mylog("Usage:\n"
+	printf("Usage:\n"
 		"-h			help\n"
 		"-F			foreground\n"
 		"-d			log level(1 info, 2 trace)\n"

@@ -6,7 +6,6 @@
 #include <assert.h>
 #include <unistd.h>
 #include <linux/limits.h>
-#include "mylog.h"
 #include "mysocket.h"
 #include "socks.h"
 #include "cstate.h"
@@ -39,7 +38,7 @@ static int http_fake_len;
 
 static void usage()
 {
-	mylog("Usage:\n"
+	printf("Usage:\n"
 		"-h			help\n"
 		"-F			forground\n"
 		"-d			log level(1 info, 2 trace)\n"
@@ -261,7 +260,7 @@ static void client_cb(EV_P_ ev_io *w, int events)
 					c->rlen = c->ridx = 0;
 					ev_io_init(&pc->w, relay_cb, fd, EV_READ);
 					ev_io_start(loop, &pc->w);
-					mylog("into CS_DATA\n");
+					printf("into CS_DATA\n");
 					//wbuf == reply
 					rc = mywrite(w->fd, c->wbuf, c->wlen);
 					if (rc < 0 || rc < c->wlen)
